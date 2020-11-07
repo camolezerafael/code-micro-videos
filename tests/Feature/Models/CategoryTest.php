@@ -129,14 +129,11 @@ class CategoryTest extends TestCase {
 				'is_active'   => false,
 			] );
 		
-		$before = Category::all()->count();
-		
 		$category->delete();
+		$this->assertNull( Category::find( $category->id ) );
 		
-		$after = Category::all()->count();
-		
-		$this->assertEquals(1, $before);
-		$this->assertEquals(0, $after);
+		$category->restore();
+		$this->assertNotNull( Category::find( $category->id ) );
 		
 	}
 	

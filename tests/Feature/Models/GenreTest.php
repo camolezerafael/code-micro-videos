@@ -85,13 +85,13 @@ class GenreTest extends TestCase {
 		 */
 		$genre = factory( Genre::class )->create(
 			[
-				'name' => 'test_name',
-				'is_active'   => false,
+				'name'      => 'test_name',
+				'is_active' => false,
 			] );
 		
 		$data = [
-			'name'        => 'name_updated',
-			'is_active'   => true,
+			'name'      => 'name_updated',
+			'is_active' => true,
 		];
 		
 		$genre->update( $data );
@@ -108,17 +108,14 @@ class GenreTest extends TestCase {
 		 */
 		$genre = factory( Genre::class )->create(
 			[
-				'name' => 'test_name'
+				'name' => 'test_name',
 			] );
 		
-		$before = Genre::all()->count();
-		
 		$genre->delete();
+		$this->assertNull( Genre::find( $genre->id ) );
 		
-		$after = Genre::all()->count();
-		
-		$this->assertEquals(1, $before);
-		$this->assertEquals(0, $after);
+		$genre->restore();
+		$this->assertNotNull( Genre::find( $genre->id ) );
 		
 	}
 	

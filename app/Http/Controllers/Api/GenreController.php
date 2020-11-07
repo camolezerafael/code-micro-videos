@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 
-class GenreController extends Controller
-{
+class GenreController extends Controller {
 	private $rules = [
 		'name'      => 'required|max:255',
 		'is_active' => 'boolean',
@@ -19,8 +18,10 @@ class GenreController extends Controller
 	
 	public function store( Request $request ) {
 		$this->validate( $request, $this->rules );
+		$genre = Genre::create( $request->all() );
+		$genre->refresh();
 		
-		return Genre::create( $request->all() );
+		return $genre;
 	}
 	
 	public function show( Genre $genre ) {
@@ -36,6 +37,7 @@ class GenreController extends Controller
 	
 	public function destroy( Genre $genre ) {
 		$genre->delete();
+		
 		return response()->noContent(); // 204 - No Content
 	}
 }
