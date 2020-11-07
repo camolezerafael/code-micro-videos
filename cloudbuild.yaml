@@ -2,7 +2,7 @@ steps:
 
   - id: "Executando docker-compose"
     name: 'docker/compose'
-    args: [ '-f', 'docker-compose.cloudbuild.yaml', 'up', '-d' ]
+    args: [ '-f', 'docker-compose.yaml', 'up', '-d' ]
 
   - id: "Permissão em www"
     name: 'docker'
