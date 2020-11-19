@@ -5,7 +5,3 @@
 ## Descrição
 
 Repositório do Projeto CodeFlix
-
-.
-
-.
