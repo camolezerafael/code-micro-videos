@@ -8,10 +8,15 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller {
 	
-	private $rules = [
-		'name'      => 'required|max:255',
-		'is_active' => 'boolean',
-	];
+	private $rules;
+	
+	public function __construct() {
+		$this->rules = [
+			'name'        => 'required|max:255',
+			'description' => 'nullable',
+			'is_active'   => 'boolean',
+		];
+	}
 	
 	public function index() {
 		return Category::all();

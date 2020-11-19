@@ -8,13 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Model {
 	use SoftDeletes, Traits\Uuid;
 	
-	protected $fillable     = [ 'name', 'description', 'is_active' ];
-	protected $dates        = [ 'deleted_at' ];
-	protected $keyType      = 'string';
-	protected $casts = [
-		'is_active' => 'boolean'
-	];
+	protected $fillable = [ 'name', 'description', 'is_active' ];
+	protected $dates    = [ 'deleted_at' ];
+	protected $keyType  = 'string';
+	protected $casts    = [ 'is_active' => 'boolean' ];
 	
-	public    $incrementing = false;
+	public $incrementing = false;
 	
 }
