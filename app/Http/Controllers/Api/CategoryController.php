@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller {
+class CategoryController extends BasicCrudController {
 	
 	private $rules;
 	
@@ -23,27 +23,56 @@ class CategoryController extends Controller {
 	}
 	
 	public function store( Request $request ) {
-		$this->validate( $request, $this->rules );
-		$category = Category::create( $request->all() );
-		$category->refresh();
+		$validatedData = $this->validate( $request, $this->rulesStore() );
+		$self          = $this;
+		$obj           = \DB::transaction( function() use ( $request, $validatedData, $self ) {
+			$obj = $this->model()::create( $validatedData );
+			$self->handleRelations( $obj, $request );
+			
+			return $obj;
+		} );
+		$obj->refresh();
 		
-		return $category;
+		return $obj;
 	}
 	
-	public function show( Category $category ) {
-		return $category;
-	}
-	
-	public function update( Request $request, Category $category ) {
-		$this->validate( $request, $this->rules );
-		$category->update( $request->all() );
+	public function update( Request $request, $id ) {
+		$obj           = $this->findOrFail( $id );
+		$validatedData = $this->validate( $request, $this->rulesUpdate() );
+		$self          = $this;
+		$obj           = \DB::transaction( function() use ( $request, $validatedData, $self, $obj ) {
+			$obj->update( $validatedData );
+			$self->handleRelations( $obj, $request );
+			
+			return $obj;
+		} );
 		
-		return $category;
+		return $obj;
 	}
 	
-	public function destroy( Category $category ) {
-		$category->delete();
+	public function show( $id ) {
+		return $this->findOrFail( $id );
+	}
+	
+	public function destroy( $id ) {
+		$this->findOrFail( $id )->delete();
 		
 		return response()->noContent(); // 204 - No Content
+	}
+	
+	protected function handleRelations( $category, Request $request ) {
+		$category->genres()->sync( $request->get( 'genres_id' ) );
+	}
+	
+	protected function model() {
+		return Category::class;
+	}
+	
+	protected function rulesStore() {
+		return $this->rules;
+	}
+	
+	protected function rulesUpdate() {
+		return $this->rules;
 	}
 }
