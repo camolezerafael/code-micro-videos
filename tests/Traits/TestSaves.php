@@ -24,7 +24,6 @@ trait TestSaves {
 		return $response;
 	}
 	
-	
 	protected function assertUpdate( array $sendData, array $testDatabase, array $testJsonData = null ): TestResponse {
 		
 		/** @var  TestResponse  $response */

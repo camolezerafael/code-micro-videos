@@ -8,12 +8,12 @@ use Tests\TestCase;
 use Mockery\MockInterface;
 
 class GenreHasCategoriesRuleUnitTest extends TestCase {
+	
 	/**
 	 * A basic unit test example.
 	 *
 	 * @return void
 	 */
-	
 	public function testCategoriesIdField() {
 		$rule               = new GenresHasCategoriesRule( [ 1, 1, 2, 2 ] );
 		$reflectionClass    = new \ReflectionClass( GenresHasCategoriesRule::class );
