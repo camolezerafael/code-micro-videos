@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Models\Category;
+use App\Models\Genre;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Tests\Traits\TestSaves;
@@ -44,38 +45,44 @@ class CategoryControllerTest extends TestCase {
 		$this->assertInvalidationInUpdateAction( $data, 'boolean' );
 	}
 	
-	public function testStore() {
-		$data = [
-			'name' => 'test',
+	public function testSave() {
+		$genreId = factory( Genre::class )->create()->id;
+		$data    = [
+			[
+				'send_data' => [
+					'name'      => 'test',
+					'genres_id' => [ $genreId ],
+				],
+				'test_data' => [
+					'name'       => 'test',
+					'is_active'  => true,
+					'deleted_at' => null,
+				],
+			],
+			[
+				'send_data' => [
+					'name'      => 'test',
+					'is_active' => false,
+					'genres_id' => [ $genreId ],
+				],
+				'test_data' => [
+					'name'       => 'test',
+					'is_active'  => false,
+					'deleted_at' => null,
+				],
+			],
 		];
-		$this->assertStore( $data, $data + [ 'description' => null, 'is_active' => true, 'deleted_at' => null ] );
 		
-		$data = [
-			'name'        => 'test',
-			'description' => 'description',
-			'is_active'   => false,
-		];
-		$this->assertStore( $data, $data + [ 'description' => 'description', 'is_active' => false ] );
-	}
-	
-	
-	public function testUpdate() {
-		$data = [
-			'name'        => 'test',
-			'description' => 'description changed',
-			'is_active'   => true,
-		];
-		$this->assertUpdate( $data, $data + [ 'deleted_at' => null ] )
-			 ->assertJsonStructure( [ 'created_at', 'deleted_at' ] );
+		foreach ( $data as $value ) {
+			$response = $this->assertStore( $value['send_data'], $value['test_data'] );
+			$response->assertJsonStructure( [ 'created_at', 'updated_at' ] );
+			$this->assertHasGenre( $response->json( 'id' ), $value['send_data']['genres_id'][0] );
+			
+			$response = $this->assertUpdate( $value['send_data'], $value['test_data'] );
+			$response->assertJsonStructure( [ 'created_at', 'updated_at' ] );
+			$this->assertHasGenre( $response->json( 'id' ), $value['send_data']['genres_id'][0] );
+		}
 		
-		$data = [
-			'name'        => 'test changed',
-			'description' => '',
-		];
-		$this->assertUpdate( $data, array_merge( $data, [ 'description' => null ] ) );
-		
-		$data['description'] = null;
-		$this->assertUpdate( $data, array_merge( $data, [ 'description' => null ] ) );
 	}
 	
 	public function testDestroy() {
@@ -85,6 +92,13 @@ class CategoryControllerTest extends TestCase {
 		
 		$this->assertNull( Category::find( $this->category->id ) );
 		$this->assertNotNull( Category::withTrashed()->find( $this->category->id ) );
+	}
+	
+	protected function assertHasGenre( $categoryId, $genreId ) {
+		$this->assertDatabaseHas( 'category_genre', [
+			'genre_id'    => $genreId,
+			'category_id' => $categoryId,
+		] );
 	}
 	
 	protected function routeStore() {

@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder {
 			[
 				CategoriesTableSeeder::class,
 				GenresTableSeeder::class,
+				CastMembersSeeder::class,
+				VideosTableSeeder::class,
 			] );
 	}
 }

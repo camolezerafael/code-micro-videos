@@ -15,4 +15,7 @@ class Category extends Model {
 	
 	public $incrementing = false;
 	
+	public function genres() {
+		return $this->belongsToMany( Genre::class )->withTrashed();
+	}
 }
