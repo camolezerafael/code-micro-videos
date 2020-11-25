@@ -27,7 +27,7 @@ trait TestSaves {
 	
 	protected function assertUpdate( array $sendData, array $testDatabase, array $testJsonData = null ): TestResponse {
 		
-		/** @var TestResponse $response */
+		/** @var  TestResponse  $response */
 		$response = $this->json( 'PUT', $this->routeUpdate(), $sendData );
 		
 		if ( $response->status() !== 200 ) {

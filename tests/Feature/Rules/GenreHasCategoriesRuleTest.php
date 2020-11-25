@@ -20,6 +20,8 @@ use Tests\TestCase;
  *
  *
  *
+ *
+ *
  * TENTAREI RESOLVER DEPOIS
  *
  * Class GenreHasCategoriesRuleTest
