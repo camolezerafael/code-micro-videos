@@ -216,6 +216,8 @@ class VideoControllerTest extends TestCase {
 //		}
 //	}
 	
+	
+	
 	public function testDestroy() {
 		$response = $this->json( 'DELETE', route( 'videos.destroy', [ 'video' => $this->video->id ] ) );
 		

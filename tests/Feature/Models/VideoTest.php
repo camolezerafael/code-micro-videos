@@ -51,6 +51,8 @@ class VideoTest extends TestCase {
 		);
 	}
 	
+	
+	
 	public function testCreateWithBasicFields() {
 		$video = Video::create( $this->data );
 		$video->refresh();

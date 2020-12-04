@@ -28,6 +28,7 @@ trait TestUploads {
 			$response = $this->json( $route['method'], $route['route'], [ $field => $file ] );
 			
 			$this->assertInvalidationsFields( $response, [ $field ], 'max.file', [ 'max' => $maxSize ] );
+			
 		}
 	}
 	
