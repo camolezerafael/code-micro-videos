@@ -45,6 +45,7 @@ trait UploadFiles {
 				$attributes[ $file ] = $attributes[ $file ]->hashName();
 			}
 		}
+		
 		return $files;
 	}
 	
