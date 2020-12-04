@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use PHPUnit\Framework\TestCase;
 
-class CategoryTest extends TestCase {
+class CategoryUnitTest extends TestCase {
 	
 	use DatabaseMigrations;
 	

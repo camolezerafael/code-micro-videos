@@ -29,6 +29,9 @@ class GenresHasCategoriesRule implements Rule {
 	 * @return bool
 	 */
 	public function passes( $attribute, $value ) {
+		if ( !is_array( $value ) ) {
+			$value = [];
+		}
 		$this->genresId = array_unique( $value );
 		
 		if ( !count( $this->genresId ) || !count( $this->categoriesId ) ) {
