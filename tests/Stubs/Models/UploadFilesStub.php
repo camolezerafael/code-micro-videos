@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class UploadFilesStub extends Model {
 	
-	
 	protected $table    = 'upload_file_stubs';
 	protected $fillable = [ 'name', 'file1', 'file2' ];
 	

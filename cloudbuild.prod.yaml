@@ -1,6 +1,6 @@
 steps:
 
-  - id: "Executando docker-compose "
+  - id: "Executando docker-compose"
     name: 'docker/compose'
     args: [ '-f', 'docker-compose.prod.yaml', 'up', '-d' ]
 
