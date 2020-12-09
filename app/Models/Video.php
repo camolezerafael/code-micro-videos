@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Video extends Model {
 	use SoftDeletes, Uuid, UploadFiles;
 	
-	const RATING_LIST         = [ 'L', '10', '12', '14', '16', '18' ];
+	const RATING_LIST  = [ 'L', '10', '12', '14', '16', '18' ];
+	const VIDEO_SIZE   = 1024 * 1024 * 1024 * 50;
+	const TRAILER_SIZE = 1024 * 1024 * 1024 * 1;
+	const BANNER_SIZE  = 1024 * 1024 * 10;
+	const THUMB_SIZE   = 1024 * 1024 * 5;
 	
 	protected $fillable = [
 		'title',
@@ -20,6 +24,9 @@ class Video extends Model {
 		'rating',
 		'duration',
 		'video_file',
+		'thumb_file',
+		'banner_file',
+		'trailer_file',
 	];
 	
 	protected $dates = [ 'deleted_at' ];
@@ -32,7 +39,7 @@ class Video extends Model {
 	];
 	
 	public        $incrementing = false;
-	public static $fileFields   = [ 'video_file', 'thumb_file' ];
+	public static $fileFields   = [ 'video_file', 'thumb_file', 'banner_file', 'trailer_file' ];
 	
 	public static function create( array $attributes = [] ) {
 		$files = self::extractFiles( $attributes );
@@ -48,7 +55,7 @@ class Video extends Model {
 			return $obj;
 		} catch ( \Exception $e ) {
 			if ( isset( $obj ) ) {
-				// excluir arquivos upload
+				$obj->deleteFiles( $files );
 			}
 			\DB::rollback();
 			throw $e;
@@ -57,6 +64,7 @@ class Video extends Model {
 	}
 	
 	public function update( array $attributes = [], array $options = [] ) {
+		$files = self::extractFiles( $attributes );
 		try {
 			\DB::beginTransaction();
 			
@@ -64,13 +72,16 @@ class Video extends Model {
 			static::handleRelations( $this, $attributes );
 			
 			if ( $saved ) {
-				//upload aqui
-				//excluir antigos
+				$this->uploadFiles( $files );
 			}
 			
 			\DB::commit();
+			
+			if ( $saved && count( $files ) ) {
+				$this->deleteOldFiles();
+			}
 		} catch ( \Exception $e ) {
-			// excluir arquivos upload
+			$this->deleteFiles( $files );
 			\DB::rollback();
 			throw $e;
 		}
