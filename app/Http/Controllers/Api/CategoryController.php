@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -18,10 +18,6 @@ class CategoryController extends BasicCrudController {
 		];
 	}
 	
-	public function index() {
-		return Category::all();
-	}
-	
 	public function store( Request $request ) {
 		$validatedData = $this->validate( $request, $this->rulesStore() );
 		$self          = $this;
@@ -33,7 +29,7 @@ class CategoryController extends BasicCrudController {
 		} );
 		$obj->refresh();
 		
-		return $obj;
+		return new CategoryResource( $obj );
 	}
 	
 	public function update( Request $request, $id ) {
@@ -47,17 +43,7 @@ class CategoryController extends BasicCrudController {
 			return $obj;
 		} );
 		
-		return $obj;
-	}
-	
-	public function show( $id ) {
-		return $this->findOrFail( $id );
-	}
-	
-	public function destroy( $id ) {
-		$this->findOrFail( $id )->delete();
-		
-		return response()->noContent(); // 204 - No Content
+		return new CategoryResource( $obj );
 	}
 	
 	protected function handleRelations( $category, Request $request ) {
@@ -74,5 +60,13 @@ class CategoryController extends BasicCrudController {
 	
 	protected function rulesUpdate() {
 		return $this->rules;
+	}
+	
+	protected function resourceCollection() {
+		return $this->resource();
+	}
+	
+	protected function resource() {
+		return CategoryResource::class;
 	}
 }

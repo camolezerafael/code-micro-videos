@@ -12,7 +12,10 @@ class CastMember extends Model {
 	const TYPE_DIRECTOR = 1;
 	const TYPE_ACTOR    = 2;
 	
+	protected $dates        = [ 'deleted_at', 'created_at', 'updated_at' ];
 	protected $fillable     = [ 'name', 'type' ];
-	protected $dates        = [ 'deleted_at' ];
+	protected $keyType      = 'string';
+	
 	public    $incrementing = false;
+	
 }

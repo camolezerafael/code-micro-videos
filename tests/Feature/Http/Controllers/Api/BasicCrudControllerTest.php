@@ -29,7 +29,7 @@ class BasicCrudControllerTest extends TestCase {
 	public function testIndex() {
 		/** @var CategoryStub $category */
 		$category = CategoryStub::create( [ 'name' => 'test_name', 'description' => 'test_description' ] );
-		$this->assertEquals( [ $category->toArray() ], $this->controller->index()->toArray() );
+		$this->assertEquals( $category->toArray(), $this->controller->index()->collection[0]->resource->toArray() );
 	}
 	
 	
@@ -51,7 +51,7 @@ class BasicCrudControllerTest extends TestCase {
 				->andReturn( [ 'name' => 'test_name', 'description' => 'test_description' ] );
 		
 		$obj = $this->controller->store( $request );
-		$this->assertEquals( CategoryStub::find( 1 )->toArray(), $obj->toArray() );
+		$this->assertEquals( CategoryStub::find( 1 )->toArray(), $obj->resource->toArray() );
 	}
 	
 	
@@ -81,7 +81,7 @@ class BasicCrudControllerTest extends TestCase {
 	public function testShow() {
 		$category = CategoryStub::create( [ 'name' => 'test_name', 'description' => 'test_description' ] );
 		$result   = $this->controller->show( $category->id );
-		$this->assertEquals( $result->toArray(), CategoryStub::find( 1 )->toArray() );
+		$this->assertEquals( $result->resource->toArray(), CategoryStub::find( 1 )->toArray() );
 	}
 	
 	public function testUpdate() {
@@ -91,7 +91,7 @@ class BasicCrudControllerTest extends TestCase {
 				->once()
 				->andReturn( [ 'name' => 'test_changed', 'description' => 'test_description_changed' ] );
 		$result = $this->controller->update( $request, $category->id );
-		$this->assertEquals( $result->toArray(), CategoryStub::find( 1 )->toArray() );
+		$this->assertEquals( $result->resource->toArray(), CategoryStub::find( 1 )->toArray() );
 	}
 	
 	public function testDestroy() {
@@ -102,5 +102,4 @@ class BasicCrudControllerTest extends TestCase {
 		$this->assertCount( 0, CategoryStub::all() );
 		
 	}
-	
 }

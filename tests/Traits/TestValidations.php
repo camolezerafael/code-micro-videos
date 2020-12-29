@@ -34,9 +34,14 @@ trait TestValidations {
 	}
 	
 	protected function assertStatusAndJson( TestResponse $response, int $statusExpected, array $testJsonData ) {
-		$response
-			->assertStatus( $statusExpected )
-			->assertJson( $testJsonData );
+		return $response->assertStatus( $statusExpected )
+						->assertJson( $testJsonData );
+		
+	}
+	
+	protected function assertStatusAndStructure( TestResponse $response, int $statusExpected, array $testJsonStructure ) {
+		return $response->assertStatus( $statusExpected )
+						->assertJsonStructure( $testJsonStructure );
 	}
 	
 }

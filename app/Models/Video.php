@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Video extends Model {
 	use SoftDeletes, Uuid, UploadFiles;
 	
-	const RATING_LIST  = [ 'L', '10', '12', '14', '16', '18' ];
-	const VIDEO_SIZE   = 1024 * 1024 * 1024 * 50;
-	const TRAILER_SIZE = 1024 * 1024 * 1024 * 1;
-	const BANNER_SIZE  = 1024 * 1024 * 10;
-	const THUMB_SIZE   = 1024 * 1024 * 5;
+	const RATING_LIST = [ 'L', '10', '12', '14', '16', '18' ];
+	
+	const VIDEO_SIZE   = 1024 * 1024 * 50;
+	const TRAILER_SIZE = 1024 * 1024 * 1;
+	const BANNER_SIZE  = 1024 * 10;
+	const THUMB_SIZE   = 1024 * 5;
 	
 	protected $fillable = [
 		'title',
@@ -29,16 +30,18 @@ class Video extends Model {
 		'trailer_file',
 	];
 	
-	protected $dates = [ 'deleted_at' ];
+	protected $dates = [ 'deleted_at', 'created_at', 'updated_at' ];
 	
 	protected $casts = [
 		'id'            => 'string',
 		'opened'        => 'boolean',
 		'year_launched' => 'integer',
 		'duration'      => 'integer',
+		'rating'        => 'string',
 	];
 	
 	public        $incrementing = false;
+	protected     $hidden       = [ 'video_file', 'thumb_file', 'banner_file', 'trailer_file' ];
 	public static $fileFields   = [ 'video_file', 'thumb_file', 'banner_file', 'trailer_file' ];
 	
 	public static function create( array $attributes = [] ) {
@@ -87,7 +90,6 @@ class Video extends Model {
 		}
 	}
 	
-	
 	public static function handleRelations( Video $video, array $attributes ) {
 		if ( isset( $attributes['categories_id'] ) ) {
 			$video->categories()->sync( $attributes['categories_id'] );
@@ -107,5 +109,21 @@ class Video extends Model {
 	
 	protected function uploadDir() {
 		return $this->id;
+	}
+	
+	public function getThumbFileUrlAttribute() {
+		return $this->thumb_file ? $this->getFileUrl( $this->thumb_file ) : null;
+	}
+	
+	public function getBannerFileUrlAttribute() {
+		return $this->banner_file ? $this->getFileUrl( $this->banner_file ) : null;
+	}
+	
+	public function getTrailerFileUrlAttribute() {
+		return $this->trailer_file ? $this->getFileUrl( $this->trailer_file ) : null;
+	}
+	
+	public function getVideoFileUrlAttribute() {
+		return $this->video_file ? $this->getFileUrl( $this->video_file ) : null;
 	}
 }
