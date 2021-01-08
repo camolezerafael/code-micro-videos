@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  php:
+    container_name: pkg
+    image: php:7.3.25-cli
+    volumes:
+      - ./:/opt/project
+    entrypoint: /bin/bash
+    tty: true
