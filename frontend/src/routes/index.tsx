@@ -1,7 +1,7 @@
 import {RouteProps} from "react-router-dom"
 import Dashboard from "../pages/Dashboard"
 import CategoryList from "../pages/category/PageList"
-import CastMemberList from "../pages/cast_member/PageList"
+import CastMemberList from "../pages/cast-member/PageList"
 import GenreList from "../pages/genre/PageList"
 
 export interface MyRouteProps extends RouteProps {
@@ -34,14 +34,14 @@ const routes: MyRouteProps[] = [
 	{
 		name: 'cast_members.list',
 		label: 'Elenco',
-		path: '/cast_members',
+		path: '/cast-members',
 		component: CastMemberList,
 		exact: true
 	},
 	{
 		name: 'cast_members.create',
 		label: 'Criar elenco',
-		path: '/cast_members/create',
+		path: '/cast-members/create',
 		component: CastMemberList,
 		exact: true
 	},

@@ -6,7 +6,14 @@ import {httpVideo} from "../../util/http"
 import format from "date-fns/format"
 import parseISO from "date-fns/parseISO"
 
-const membersType = ['Diretor', 'Ator'];
+type memberMap = {
+	[key:number] : string
+}
+
+const CastMembersTypeMap: memberMap = {
+	1: 'Diretor',
+	2: 'Ator'
+};
 
 const columnsDefinition: MUIDataTableColumn[] = [
 	{
@@ -18,7 +25,7 @@ const columnsDefinition: MUIDataTableColumn[] = [
 		label: 'Tipo',
 		options: {
 			customBodyRender(value, tableMeta, updateValue){
-				return membersType[value -1]
+				return CastMembersTypeMap[value];
 			}
 		}
 	},
