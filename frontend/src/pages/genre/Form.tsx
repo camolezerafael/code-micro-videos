@@ -20,7 +20,8 @@ const Form = () => {
 
 	const buttonProps: ButtonProps = {
 		className: classes.submit,
-		variant: "outlined",
+		variant: 'contained',
+		color: 'secondary'
 	}
 
 	const [categories, setCategories] = useState<any[]>([]);
@@ -30,8 +31,6 @@ const Form = () => {
 			categories_id: []
 		}
 	});
-
-	// const category = getValues()['categories_id'];
 
 	useEffect(()=>{
 		register({name:'categories_id'})

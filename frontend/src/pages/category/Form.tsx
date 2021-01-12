@@ -18,7 +18,8 @@ const Form = () => {
 
 	const buttonProps: ButtonProps = {
 		className: classes.submit,
-		variant: "outlined",
+		variant: 'contained',
+		color: 'secondary'
 	}
 
 	const {register, handleSubmit, getValues} = useForm({
@@ -41,20 +42,24 @@ const Form = () => {
 				fullWidth
 				variant={"outlined"}
 				inputRef={register}
-			/> <TextField
-			name="description"
-			label="Descrição"
-			multiline
-			rows="4"
-			fullWidth
-			variant={"outlined"}
-			margin={"normal"}
-			inputRef={register}
-		/> <Checkbox
-			name={"is_active"}
-			inputRef={register}
-			defaultChecked
-		/> Ativo?
+			/>
+			<TextField
+				name="description"
+				label="Descrição"
+				multiline
+				rows="4"
+				fullWidth
+				variant={"outlined"}
+				margin={"normal"}
+				inputRef={register}
+			/>
+			<Checkbox
+				name={"is_active"}
+				color={"primary"}
+				inputRef={register}
+				defaultChecked
+			/>
+			Ativo?
 			<Box dir={"rtl"}>
 				<Button {...buttonProps} onClick={()=>onSubmit(getValues())}>Salvar</Button>
 				<Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
