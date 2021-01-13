@@ -3,6 +3,8 @@ import {Box, Button, ButtonProps, Checkbox, TextField} from "@material-ui/core"
 import {makeStyles, Theme} from "@material-ui/core/styles"
 import {useForm} from 'react-hook-form';
 import categoryHttp from "../../util/http/category-http"
+import * as yup from '../../util/vendor/yup';
+import {yupResolver} from "@hookform/resolvers/yup"
 
 const useStyles = makeStyles((theme: Theme) => {
 	return {
@@ -10,7 +12,20 @@ const useStyles = makeStyles((theme: Theme) => {
 			margin: theme.spacing(0.5)
 		}
 	}
-})
+});
+
+type Category = {
+	name: string;
+	description: string;
+	is_active:boolean;
+}
+
+const validationSchema = yup.object().shape({
+	name: yup.string()
+		.label('Nome')
+		.required(),
+});
+
 
 const Form = () => {
 
@@ -22,10 +37,11 @@ const Form = () => {
 		color: 'secondary'
 	}
 
-	const {register, handleSubmit, getValues} = useForm({
+	const {register, handleSubmit, getValues, errors} = useForm<Category>({
+		resolver: yupResolver(validationSchema),
 		defaultValues: {
 			is_active: true
-		}
+		},
 	});
 
 	function onSubmit(formData: any) {
@@ -42,6 +58,8 @@ const Form = () => {
 				fullWidth
 				variant={"outlined"}
 				inputRef={register}
+				error={errors.name !== undefined}
+				helperText={errors.name && errors.name.message}
 			/>
 			<TextField
 				name="description"
