@@ -1,14 +1,14 @@
 import {setLocale} from 'yup';
 
 const ptBR = {
-	mixed:{
-		required: '${path} é requerido'
+	mixed: {
+		required: '${path} é obrigatório'
 	},
-	string:{
+	string: {
 		max: '${path} precisa ter no máximo ${max} caracteres',
 		min: '${path} precisa ter no mínimo ${min} caracteres',
 	},
-	number:{
+	number: {
 		min: '${path} precisa ser no mínimo ${min}',
 		max: '${path} precisa ser no máximo ${min}',
 	}
