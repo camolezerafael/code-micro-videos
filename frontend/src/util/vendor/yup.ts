@@ -1,6 +1,7 @@
 import {setLocale} from 'yup';
 
 const ptBR = {
+
 	mixed: {
 		required: '${path} é obrigatório'
 	},
