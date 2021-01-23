@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => {
 	}
 });
 
-type Category = {
+export type Category = {
 	name: string;
 	description: string;
 	is_active:boolean;
@@ -27,12 +27,12 @@ const validationSchema = yup.object().shape({
 	name: yup.string()
 		.label('Nome')
 		.required(),
-});
+	is_active: yup.boolean()
+		.label('Ativo?')
+})
 
 
 const Form = () => {
-
-	const classes = useStyles();
 
 	const {
 		register,
@@ -49,6 +49,7 @@ const Form = () => {
 		},
 	});
 
+	const classes = useStyles();
 	const snackbar = useSnackbar();
 	const history = useHistory();
 	const {id} = useParams<{id:string}>();
@@ -63,53 +64,62 @@ const Form = () => {
 	}
 
 	useEffect(() => {
-		register({name:'is_active'})
-	}, [register]);
-
-	useEffect(() => {
 		if(!id){
 			return;
 		}
 
-		setLoading(true);
-
-		categoryHttp
-			.get(id)
-			.then( ({data}) => {
+		async function getCategory(){
+			setLoading(true);
+			try {
+				const {data} = await categoryHttp.get(id);
 				setCategory(data.data);
 				reset(data.data);
-			})
-			.finally(() => setLoading(false))
-	}, [])
-
-	function onSubmit(formData: any, event: any) {
-		setLoading(true);
-
-		const http = !category
-			? categoryHttp.create(formData)
-			: categoryHttp.update(category.id, formData);
-
-		http
-			.then(({data}) => {
-				snackbar.enqueueSnackbar('Categoria salva com sucesso', {
-					variant: 'success',
-				});
-				setTimeout(()=>{
-					event
-						? (
-							id ? history.replace(`/categories/${data.data.id}/edit`)
-								: history.push(`/categories/${data.data.id}/edit`)
-						)
-						: history.push('/categories')
-				})
-			})
-			.catch((error) => {
+			}catch (error) {
 				console.log(error);
-				snackbar.enqueueSnackbar('Não foi possível salvar a categoria', {
+				snackbar.enqueueSnackbar('Não foi possível carregar as informações', {
 					variant: 'error',
 				});
-			})
-			.finally(() => setLoading(false));
+			}finally {
+				setLoading(false);
+			}
+		}
+
+		getCategory();
+	}, [id, reset,snackbar])
+
+	useEffect(() => {
+		register({name:'is_active'})
+	}, [register])
+
+	async function onSubmit(formData: any, event: any) {
+		setLoading(true);
+
+		try {
+			const http = !category
+				? categoryHttp.create(formData)
+				: categoryHttp.update(category.id, formData);
+			const {data} = await http;
+
+			snackbar.enqueueSnackbar('Categoria salva com sucesso',
+		{ variant: 'success' }
+			);
+			setTimeout(()=>{
+				event
+					? (
+						id ? history.replace(`/categories/${data.data.id}/edit`)
+							: history.push(`/categories/${data.data.id}/edit`)
+					)
+					: history.push('/categories')
+			});
+		}catch (error) {
+			console.log(error);
+			snackbar.enqueueSnackbar(
+				'Não foi possível salvar a categoria',
+				{ variant: 'error' }
+				);
+		}finally {
+			setLoading(false);
+		}
 	}
 
 	return (

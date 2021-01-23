@@ -43,15 +43,22 @@ const routes: MyRouteProps[] = [
 	},
 	{
 		name: 'cast_members.list',
-		label: 'Elenco',
+		label: 'Membros de Elenco',
 		path: '/cast-members',
 		component: CastMemberList,
 		exact: true
 	},
 	{
 		name: 'cast_members.create',
-		label: 'Criar elenco',
+		label: 'Criar membro de elenco',
 		path: '/cast-members/create',
+		component: CastMemberForm,
+		exact: true
+	},
+	{
+		name: 'cast_members.edit',
+		label: 'Editar membro de elenco',
+		path: '/cast-members/:id/edit',
 		component: CastMemberForm,
 		exact: true
 	},
@@ -66,6 +73,13 @@ const routes: MyRouteProps[] = [
 		name: 'genres.create',
 		label: 'Criar gênero',
 		path: '/genres/create',
+		component: GenreForm,
+		exact: true
+	},
+	{
+		name: 'genres.edit',
+		label: 'Editar gênero',
+		path: '/genres/:id/edit',
 		component: GenreForm,
 		exact: true
 	}
