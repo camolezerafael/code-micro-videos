@@ -1,10 +1,15 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import MUIDataTable, {MUIDataTableColumn} from "mui-datatables"
-import {httpVideo} from "../../util/http"
+import DefaultTable, {makeActionsStyle, TableColumn} from '../../components/Table'
 
 import format from "date-fns/format"
 import parseISO from "date-fns/parseISO"
+import {CastMember, ListResponse} from "../../util/models"
+import {IconButton, MuiThemeProvider} from "@material-ui/core"
+import {Link} from "react-router-dom"
+import EditIcon from "@material-ui/icons/Edit"
+import castMemberHttp from "../../util/http/cast-member-http"
+import {useSnackbar} from "notistack"
 
 type memberMap = {
 	[key:number] : string
@@ -15,7 +20,15 @@ const CastMembersTypeMap: memberMap = {
 	2: 'Ator'
 };
 
-const columnsDefinition: MUIDataTableColumn[] = [
+const columnsDefinition: TableColumn[] = [
+	{
+		name: 'id',
+		label: 'ID',
+		width: '30%',
+		options: {
+			sort: false
+		}
+	},
 	{
 		name: 'name',
 		label: 'Nome'
@@ -37,27 +50,71 @@ const columnsDefinition: MUIDataTableColumn[] = [
 				return <span>{format(parseISO(value), 'dd/MM/yyyy')}</span>
 			}
 		}
-	}
+	},
+	{
+		name: 'actions',
+		label: 'Ações',
+		width: '13%',
+		options: {
+			sort: false,
+			customBodyRender(value, tableMeta) {
+				return (
+					<IconButton
+						color={'secondary'}
+						component={Link}
+						to={`cast-members/${tableMeta.rowData[0]}/edit`}
+					>
+						<EditIcon/>
+					</IconButton>
+				)
+			}
+		}
+	},
 ];
 
 type Props = {};
 
 const Table = (props: Props) => {
 
-	const [data, setData] = useState([]);
+	const snackbar = useSnackbar();
+	const [data, setData] = useState<CastMember[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
-		httpVideo.get('cast_members').then(
-			response => setData(response.data.data)
-		)
-	}, [])
+		let isSubscribed = true;
+		(async () => {
+			setLoading(true);
+			try{
+				const {data} = await castMemberHttp.list<ListResponse<CastMember>>();
+				if(isSubscribed){
+					setData(data.data)
+				}
+			}catch(error) {
+				console.error(error);
+				snackbar.enqueueSnackbar(
+					'Não foi possível carregar as informações',
+					{variant: 'error'}
+				)
+			}finally{
+				setLoading(false)
+			}
+		})()
+
+		return () => {
+			isSubscribed = false
+		}
+	}, [snackbar])
 
 	return (
-		<MUIDataTable
-			columns={columnsDefinition}
-			data={data}
-			title="Listagem de Elenco"
-		/>
+		<MuiThemeProvider theme={makeActionsStyle(columnsDefinition.length-1)}>
+			<DefaultTable
+				columns={columnsDefinition}
+				data={data}
+				title="Listagem de Elenco"
+				loading={loading}
+				options={{responsive: 'standard'}}
+			/>
+		</MuiThemeProvider>
 	);
 };
 

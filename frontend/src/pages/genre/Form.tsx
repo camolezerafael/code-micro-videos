@@ -1,29 +1,16 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Box, Button, ButtonProps, Checkbox, MenuItem, TextField} from "@material-ui/core"
-import {makeStyles, Theme} from "@material-ui/core/styles"
+import {Checkbox, MenuItem, TextField} from "@material-ui/core"
 import {useForm} from 'react-hook-form';
 import genreHttp from "../../util/http/genre-http"
 import categoryHttp from "../../util/http/category-http"
-import {Category} from "../category/Form"
 import * as yup from "../../util/vendor/yup"
 import {yupResolver} from "@hookform/resolvers/yup"
 import {useSnackbar} from "notistack"
 import {useHistory, useParams} from "react-router-dom"
-
-const useStyles = makeStyles((theme: Theme) => {
-	return {
-		submit: {
-			margin: theme.spacing(0.5)
-		}
-	}
-})
-
-type Genre = {
-	name: string;
-	is_active:boolean;
-	categories_id: any[] | any;
-}
+import {Category, Genre} from "../../util/models"
+import SubmitActions from "../../components/SubmitActions"
+import {DefaultForm} from "../../components/DefaultForm"
 
 const validationSchema = yup.object().shape({
 	name: yup.string()
@@ -46,8 +33,9 @@ const Form = () => {
 		setValue,
 		errors,
 		reset,
-		watch
-	} = useForm<Genre>({
+		watch,
+		trigger
+	} = useForm<Genre | any>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
 			categories_id: [],
@@ -55,52 +43,51 @@ const Form = () => {
 		},
 	});
 
-	const classes = useStyles();
 	const snackbar = useSnackbar();
 	const history = useHistory();
 	const {id} = useParams<{id:string}>();
-	const [genre, setGenre] = useState<{id:string} | null>(null);
+	const [genre, setGenre] = useState<Genre | null>(null);
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [categories, setCategories] = useState<any[]>([]);
-
-	const buttonProps: ButtonProps = {
-		className: classes.submit,
-		variant: 'contained',
-		color: 'secondary',
-		disabled: loading
-	}
 
 	useEffect(() => {
-		async function loadData() {
+		let isSubscribed = true;
+		(async () => {
 			setLoading(true);
-			const promises = [categoryHttp.list()];
+			const promises = [ categoryHttp.list({ queryParams:{ all: '' } } ) ];
 
 			if(id){
 				promises.push(genreHttp.get(id));
 			}
 			try {
 				const [categoriesResponse, genreResponse] = await Promise.all(promises);
-				setCategories(categoriesResponse.data.data);
+				if(isSubscribed) {
+					setCategories(categoriesResponse.data.data);
 
-				if(id){
-					setGenre(genreResponse.data.data);
-					reset({
-						...genreResponse.data.data,
-						categories_id: genreResponse.data.data.categories.map( (category:any) => category.id)
-					});
+					if (id) {
+						setGenre(genreResponse.data.data);
+						const categories_id = genreResponse.data.data.categories.map((category: any) => category.id)
+						reset({
+							...genreResponse.data.data,
+							categories_id
+						});
+					}
 				}
 			}catch (error) {
-				console.log(error);
+				console.error(error);
 				snackbar.enqueueSnackbar('Não foi possível carregar as informações', {
 					variant: 'error',
 				});
 			}finally {
 				setLoading(false);
 			}
+		})()
+
+		return () => {
+			isSubscribed = false
 		}
 
-		loadData();
-	}, [snackbar])
+	}, [id, reset, snackbar])
 
 	useEffect(()=>{
 		register({name:'categories_id'})
@@ -127,7 +114,7 @@ const Form = () => {
 					: history.push('/genres')
 			});
 		}catch (error) {
-			console.log(error);
+			console.error(error);
 			snackbar.enqueueSnackbar(
 				'Não foi possível salvar o gênero',
 				{ variant: 'error' }
@@ -138,7 +125,7 @@ const Form = () => {
 	}
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
+		<DefaultForm GridItemProps={{xs:12, md:6}} onSubmit={handleSubmit(onSubmit)}>
 			<TextField
 				name="name"
 				label="Nome"
@@ -185,11 +172,15 @@ const Form = () => {
 				inputRef={register}
 				defaultChecked
 			/> Ativo?
-			<Box dir={"rtl"}>
-				<Button {...buttonProps} onClick={()=>onSubmit(getValues(), null)}>Salvar</Button>
-				<Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-			</Box>
-		</form>
+			<SubmitActions
+				disabledButtons={loading}
+				handleSave={ () =>
+					trigger().then(isValid => {
+						isValid && onSubmit(getValues(), null)
+					})
+				}
+			/>
+		</DefaultForm>
 	);
 };
 
